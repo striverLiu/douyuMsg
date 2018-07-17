@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>斗鱼主播短信订阅</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
+	<script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.3/weui.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+    	html,body{
+    		padding: 0;
+    		margin: 0;
+    	}
+    	.foot{
+    		position: absolute;
+    		bottom: 0;
+    		left: 25%;
+    	}
+        .tSpan{
+            font-weight: bold;
+            font-size: 16px;
+            color: red;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
+  </head>
+  <body>
+  	<div class="weui-msg">
+        <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+        <div class="weui-msg__text-area">
+            <h2 class="weui-msg__title">订阅成功</h2>
+            <p class="weui-msg__desc">
+                恭喜您已成功订阅斗鱼主播<span class="tSpan"><%= title %></span>短信开播提醒！点击下方按钮返回。
+            </p>
+        </div>
+        <div class="weui-msg__opr-area">
+            <p class="weui-btn-area">
+                <a href="/" class="weui-btn weui-btn_primary">返回</a>
+                <!-- <a href="javascript:history.back();" class="weui-btn weui-btn_default">辅助操作</a> -->
+            </p>
+        </div>
+        <div class="weui-msg__extra-area">
+            <div class="weui-footer">
+                <p class="weui-footer__links">
+                    <a href="javascript:void(0);" class="weui-footer__link">联系邮箱</a>
+                </p>
+                <p class="weui-footer__text">Copyright &copy; 2008-2016 liveu@liveu.xin</p>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>

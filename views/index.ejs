@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>斗鱼主播短信订阅</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
+	<script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.3/weui.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/mint-ui/lib/style.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/mint-ui/lib/index.js"></script>
+    
+    <!-- <script src="https://cdn.bootcss.com/zepto/1.0rc1/zepto.min.js"></script> -->
+    <style>
+    	html,body{
+    		padding: 0;
+    		margin: 0;
+    	}
+    	.foot{
+            width: 260px;
+    		position: fixed;
+    		bottom: 0;
+    		left: 50%;
+            margin-left: -130px;
+    	}
+        .weui-input{
+            height: 50px;
+        }
+        .topTitle{
+            display: inline-block;
+            width: 100%;
+            height: 30px;
+            font-size: 20px;
+            margin: 0 auto;
+            margin-top: 20px;
+            text-align: center;
+            text-shadow: 2px 2px 1px gray;
+        }
+        .zb_info{
+            width: 94%;
+            margin: 0 auto;
+            text-align: center;
+            margin-top: -20px;
+        }
+        .bgImg{
+            width: 96%;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+        }
+        .zb_img{
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            border: 2px solid white;
+            z-index: 2;
+        }
+        .bg_img{
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            box-shadow: 3px 3px 2px gray;
+            margin-top: -26px;
+            -webkit-filter: blur(2px);
+            -moz-filter: blur(2px);
+            -ms-filter: blur(2px);    
+            filter: blur(2px);
+        }
+        .bg_roomId{
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            color: white;
+        }
+        .bg_roomName{
+            position: absolute;
+            bottom: 35px;
+            left: 15px;
+            font-size: 14px;
+            color: white;
+        }
+        .cate_name{
+            position: absolute;
+            top: 20px;
+            right: 5px;
+            font-size: 12px;
+            color: white;
+        }
+        .fans_num{
+            position: absolute;
+            top: 18px;
+            right: 5px;
+            font-size: 12px;
+            color: white;
+        }
+        .bg_zbName{
+            position: absolute;
+            bottom: 20px;
+            right: 15px;
+            font-size: 14px;
+            color: white;
+        }
+        .bg_time{
+            position: absolute;
+            bottom:6px;
+            right: 15px;
+            font-size: 12px;
+            color: white;
+        }
+        .modal{
+            width: 100%;
+            height: 200px;
+            border-radius: 8px;
+            position: absolute;
+            background: rgba(0,0,0,0.2);
+        }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+     <span class="topTitle">斗鱼主播开播短信提醒服务</span>
+  	 <div class="weui-cells weui-cells_form">
+		<div class="weui-cell weui-cell_vcode">
+		  <div class="weui-cell__hd">
+		      <label class="weui-label">手机号</label>
+		  </div>
+    	  <div class="weui-cell__bd">
+    		<input v-model="info.tel" class="weui-input" id="telphone" type="number" placeholder="请输入手机号">
+    	  </div>
+            <!-- <div class="weui-cell__ft">
+                <a href="javascript:;" class="weui-vcode-btn" id="search">查询订阅主播</a>
+            </div> -->
+	    </div>
+        <!-- 验证码 -->
+        <div class="weui-cell weui-cell_vcode">
+            <div class="weui-cell__hd">
+                <label class="weui-label">验证码</label>
+            </div>
+            <div class="weui-cell__bd">
+                <input v-model="info.number" class="weui-input" type="number" placeholder="请输入验证码">
+            </div>
+            <div class="weui-cell__ft" @click="getImgCode">
+                <!-- <span class="spanImgCode" v-html="imgHtml" @click="getImgCode"></span> -->
+                <button :disabled="isDisabled" href="javascript:;" class="weui-vcode-btn">&nbsp;{{tips}}&nbsp;&nbsp;</button>
+            </div>
+        </div>
+        <!-- 房间号 -->
+        <div class="weui-cell weui-cell_vcode">
+            <div class="weui-cell__hd">
+                <label class="weui-label">房间号</label>
+            </div>
+            <div class="weui-cell__bd">
+                <input id="roomID" class="weui-input" type="number" placeholder="请输入房间号">
+            </div>
+            <div class="weui-cell__ft" @click="change(1)">
+                <a href="javascript:;" class="weui-vcode-btn" id="search">查询主播信息</a>
+            </div>
+        </div>
+	</div><br><br>
+    <!-- 主播信息展示区域 -->
+    <div class="zb_info" v-show="zbshow">
+        <div class="bgImg">
+            <div class="modal"></div>
+            <img class="zb_img" :src="znInfo.headImg" alt=""><br>
+            <img class="bg_img" :src="znInfo.bgImg" alt="">
+            <span class="bg_roomId">房间号：{{znInfo.roomId}}</span><br>
+            <span class="bg_roomName">{{znInfo.roomName}}</span>
+            <span class="bg_zbName">--{{znInfo.zbName}}</span>
+            <span class="bg_time">上次直播时间：{{znInfo.start_time}}</span>
+            <span class="cate_name">{{znInfo.cate_name}}</span>
+        </div>
+    </div><br>
+	<a @click="dy" href="javascript:;" class="weui-btn weui-btn_primary" id="dy">订阅</a>
+    <!-- 提示信息 -->
+		<div id="loadingToast" style="display:none;">
+            <div class="weui-mask_transparent"></div>
+            <div class="weui-toast">
+                <i class="weui-loading weui-icon_toast"></i>
+                <p class="weui-toast__content">正在加载中...</p>
+            </div>
+        </div>
+
+        <div id="dialog" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <!-- <div class="weui-dialog__hd"><strong class="weui-dialog__title">弹窗标题</strong></div> -->
+                <div class="weui-dialog__bd">{{tipMsg}}</div>
+                <div class="weui-dialog__ft">
+                    <a @click="cancel" href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary">确定</a>
+                </div>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>
+<script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        zbName:'',
+        zbshow:false,
+        znInfo:{},
+        tipMsg:'',
+        imgHtml:'',
+        imgText:'',
+        tips:'发送验证码',
+        isDisabled:false,
+        num:59,
+        info:{
+            tel:'',
+            number:''
+        },
+        infoCheck:{
+            tel:'',
+            number:''
+        }
+      },
+      methods:{
+        getImgCode(){
+            let value = $('#telphone').val()
+                if(value === ''){
+                    this.$toast("请输入手机号")
+                    return;
+                }
+                if(value.length != 11){
+                    this.$toast("手机号格式错误，请重新输入")
+                    return;
+                }
+            const self = this
+            self.isDisabled = true;
+              let interval = window.setInterval(function() {  
+                self.tips = self.num+'秒后重发';  
+                --self.num;  
+                if(self.num < 0) {  
+                  self.tips = "发送验证码";  
+                  self.num = 60;  
+                  self.isDisabled = false;  
+                  window.clearInterval(interval);  
+                }  
+              }, 1000);
+            $.ajax({
+                type: "POST",
+                url: "/users/send",
+                data: {'tel':$('#telphone').val()},
+                dataType: "json",
+                success: function(res){
+                    console.log("<<<<sendMsg>>>>>>")
+                    console.log(res);
+                    if(res.Code == '200'){
+                      self.$toast('发送成功')
+                      self.infoCheck.tel = res.Data.phone
+                      self.infoCheck.number = res.Data.num
+                    }else{
+                      self.$toast("发送失败，"+res.data.Message)
+                    }
+                },
+                error: function(err){
+                    that.toast("发送失败,请稍后重试.")
+                }
+            })
+        },
+        cancel(){
+            $('#dialog').css("display","none")  
+        },
+        // 查询主播信息
+        change(val){
+            let that = this
+            if(val == 1){
+                let value = $('#roomID').val()
+                if(value === ''){
+                    that.$toast("请输入主播房间号")
+                    return;
+                }
+                $('#loadingToast').css("display","block")  
+            }else{
+                let value = $('#telphone').val()
+                if(value === ''){
+                    that.$toast("请输入手机号")
+                    return;
+                }
+                if(value.length != 11){
+                    that.$toast("手机号格式错误，请重新输入")
+                    return;
+                }
+                if(that.info.number === ''){
+                    that.$toast("请输入短信验证码")
+                    return;
+                }
+                let roomvalue = $('#roomID').val()
+                if(roomvalue === ''){
+                    that.$toast("请输入主播房间号")
+                    return;
+                }
+
+                if(this.info.tel != this.infoCheck.tel && this.info.number != this.infoCheck.number){
+                    that.$toast("输入手机号或者验证码错误!")
+                    return;
+                }
+
+            }
+            
+            $.ajax({
+                type: "POST",
+                url: "/users/search",
+                data:{roomID:$('#roomID').val()},
+                dataType: "json",
+                success: function(res){
+                    // console.log(res)
+                    if(res.Code == 200){
+                        if(res.Data.error != 0){
+                            $('#loadingToast').css("display","none")
+                            that.$toast(res.Data.data)
+                        }else{
+                            console.log(res.Data.data)
+                            $('#loadingToast').css("display","none")
+                            that.zbName = res.Data.data.owner_name
+                            if(val == 1){
+                                that.zbshow = true
+                            }
+                            
+                            // 主播信息
+                            that.znInfo = {
+                                headImg: res.Data.data.avatar,   //主播头像
+                                bgImg: res.Data.data.room_thumb, //主播封面图片
+                                roomId: res.Data.data.room_id,   //房间号
+                                zbName: res.Data.data.owner_name, //主播名字
+                                roomName: res.Data.data.room_name, //主播房间标题
+                                start_time: res.Data.data.start_time, //上次开播时间
+                                fans_num: res.Data.data.fans_num, //关注数
+                                cate_name: res.Data.data.cate_name, //区域
+                            }
+                            if(val == 2){
+                                that.routerLink()
+                            }
+                            // 打印房间信息
+                            
+                            // that.showImg = true
+                            // that.imgsrc = res.Data.data.avatar
+                            
+                        }
+                        
+                    }else{
+
+                        that.$toast("系统错误，查询失败。")
+                    }
+                },
+                error: function(err){
+                    that.$toast("系统错误")
+                }
+            })
+        },
+
+        // 点击订阅
+        dy(){
+            // this.zbshow = false
+            this.change(2)
+        },
+        routerLink(){
+            let that = this
+            $.ajax({
+                type: "POST",
+                url: "/users/getdata",
+                data: {'tel':$('#telphone').val(),'roomId':$('#roomID').val(),'zbRoom':that.zbName},
+                dataType: "json",
+                success: function(res){
+                    console.log(res)
+                    if(res.Code == 200){
+                        $('#loadingToast').css("display","block")
+                        setTimeout(function(){
+                                $('#loadingToast').css("display","none")
+                        },1500)
+                        setTimeout(function(){
+                            location.href = '/msg?name='+that.zbName
+                        },1500)
+                        
+                    }else{
+                        that.tipMsg = res.Msg
+                        $('#dialog').css("display","block")
+                        // that.$toast(res.Msg)
+                        // setTimeout(function(){
+                        //     $('#dialog').css("display","none")
+                        // },2000)
+                    }
+                }
+            });
+        }
+      }
+    })
+</script>
